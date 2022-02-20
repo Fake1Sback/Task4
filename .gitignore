@@ -1,0 +1,7 @@
+*.sln
+.vs/
+SocialEngineering/bin/
+SocialEngineering/obj/
+*.csproj
+FamilyArchive/FamilyArchive.csproj
+FamilyArchive/FamilyArchive.csproj.user

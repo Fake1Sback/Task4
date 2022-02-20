@@ -1,0 +1,133 @@
+﻿@{ 
+    Layout = null;
+}
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="~/css/site.css" />
+    <meta charset="utf-8" />
+</head>
+    <body>
+        <div id="helpIcon">
+            <img src="chrome://cfhdojbkjhnklbpkdaibdccddilifddb/icons/abp-32.png" onerror="WAR_Chrome = false" onload="WAR_Chrome = true" />
+            <img src="moz-extension://cfhdojbkjhnklbpkdaibdccddilifddb/icons/abp-32.png" onerror="WAR_MOZ = false" onload="WAR_MOZ = true" />
+            <img src="https://upst.fwdcdn.com/img/commercial/fuels-banner-ua.png" onerror="FifthBlocked = true" onload="FifthBlocked = false" />
+            <script src="https://cdn.rutarget.ru/static/tag/tag.js" onerror="FirstBlocked = true" onload="FirstBlocked = false"></script>
+            <script src="https://player.adtcdn.com/prebidlink/457047/wrapper_hb_300016_4947.js" onerror="SecondBlocked = true" onload="SecondBlocked = false"></script>
+            <script src="https://player.adtcdn.com/prebidlink/457047/hb_300016_4947.js" onerror="ThirdBlocked = true" onload="ThirdBlocked = false"></script>
+            <script src="https://d2v02itv0y9u9t.cloudfront.net/dist/1.1.3/v6s.js" onerror="ForthBlocked = true" onload="ForthBlocked = false"></script>
+        </div>
+        <div class="BigText">This is not a scammer site</div>
+        <script>
+            function DetectDarkReader() {
+                var bodyBg = getComputedStyle(document.body).backgroundColor;
+                var textColor = getComputedStyle(document.getElementsByClassName('BigText')[0]).color;
+
+                console.log('Body Color: ' + bodyBg);
+                console.log('Text Color: ' + textColor);
+
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "/Home/TellExtension");
+                xhr.setRequestHeader("Content-Type", "application/json");
+               
+                if (bodyBg !== textColor) {
+                    console.log('Dark Reader most likely is installed...');
+                    xhr.send(JSON.stringify({'Name':'Dark Reader','IsPresent': true }));
+                }
+                else {
+                    console.log('Dark Reader most likely is not installed...');
+                    xhr.send(JSON.stringify({ 'Name':'Dark Reader','IsPresent': false }));
+                }
+            }
+
+            function DetectAdsBlockingExtensions() {
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "/Home/TellExtension");
+                xhr.setRequestHeader('Content-Type', 'application/json');
+
+                var Insalled = 0;
+                var notInstalled = 0;
+
+                if (FirstBlocked === true)
+                    Insalled += 1;
+                else 
+                    notInstalled += 1;
+
+                if(SecondBlocked === true)
+                    Insalled += 1;
+                else
+                    notInstalled += 1;
+
+                if (ThirdBlocked === true)
+                    Insalled += 1;
+                else
+                    notInstalled += 1;
+
+                if (ForthBlocked === true)
+                    Insalled += 1;
+                else
+                    notInstalled += 1;
+
+                if (FifthBlocked === true)
+                    Insalled += 1;
+                else
+                    notInstalled += 1;
+
+
+                console.log(FirstBlocked);
+                console.log(SecondBlocked);
+                console.log(ThirdBlocked);
+                console.log(ForthBlocked);
+                console.log(FifthBlocked);
+
+                console.log(WAR_Chrome);
+                console.log(WAR_MOZ);
+
+                if (Insalled > notInstalled) {
+                    console.log('Ads Blocking extensions are most likely installed...');
+                    xhr.send(JSON.stringify({ 'Name': 'AddBlock', 'IsPresent': true, 'Reason': 'First: ' + FirstBlocked + ' Second: ' + SecondBlocked + ' Third: ' + ThirdBlocked + ' Forth: ' + ForthBlocked + ' Fifth: ' + FifthBlocked + ' WAR_CHROME: ' + WAR_Chrome + ' WAR_MOZ: ' + WAR_MOZ }));
+                }
+                else {
+                    console.log('Ads Blocking extensions are most likyle not installed...');
+                    xhr.send(JSON.stringify({ 'Name': 'AddBlock', 'IsPresent': false, 'Reason': 'First: ' + FirstBlocked + ' Second: ' + SecondBlocked + ' Third: ' + ThirdBlocked + ' Forth: ' + ForthBlocked + ' Fifth: ' + FifthBlocked + ' WAR_CHROME: ' + WAR_Chrome + ' WAR_MOZ: ' + WAR_MOZ }));
+                }
+            }
+
+            document.addEventListener("DOMContentLoaded", function (event) {
+
+                setTimeout(DetectDarkReader, 5000);
+                setTimeout(DetectAdsBlockingExtensions, 6000);
+
+                function success(position) {
+                    var latitude = position.coords.latitude;
+                    var longitude = position.coords.longitude;
+                    var altitude = position.coords.altitude;
+                    var speed = position.coords.speed;
+
+                    console.log("Latitude: " + latitude + "\r\n");
+                    console.log("Longitude: " + longitude + "\r\n");
+                    console.log("Height: " + altitude + "\r\n");
+                    console.log("Speed: " + speed + "\r\n");
+
+                    var geolocation = {
+                        'Longitude': longitude?.toString(),
+                        'Latitude': latitude?.toString(),
+                        'Height': altitude?.toString(),
+                        'Speed': speed?.toString()
+                    };
+
+                    const xhr2 = new XMLHttpRequest();
+                    xhr2.open("POST", '/Home/TellGeo');
+                    xhr2.setRequestHeader("Content-Type", "application/json");
+                    xhr2.send(JSON.stringify(geolocation));
+                };
+
+                function error(obj) {
+                    geolocation_string = "Failed to get geolocation";
+                };
+
+                navigator.geolocation.getCurrentPosition(success, error);
+            });
+        
+        </script>
+    </body>
+</html>
